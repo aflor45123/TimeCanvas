@@ -1,10 +1,10 @@
+/* Screen Sections */
 body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
-
 .top-box {
     background-color: grey;
     border: 2px solid black;
@@ -12,11 +12,49 @@ body {
     text-align: center;
     color: white;
 }
-
 .bottom-box {
     background-color: grey;
     border: 2px solid black;
     padding: 8px 20px;
     text-align: center;
     margin-top: auto;
+}
+
+/* Map Layout */
+#map {
+    flex: 1;
+    min-height: 200px;
+    background-color: #c5dce5;
+}
+.leaflet-tooltip.country-label {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: #39362d;
+    font-size: 11px;
+}
+
+/* Art pop-up */
+.art-popup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 160px;
+}
+.art-popup img {
+    display: block;
+    width: 75%;
+    height: 90px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.art-popup h2 {
+    margin: 10px 0 4px;
+    font-size: 18px;
+}
+.art-popup p {
+    margin: 4px 0;
+}
+#map .leaflet-popup-content-wrapper {
+    border-radius: 0;
 }
