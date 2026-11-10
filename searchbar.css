@@ -10,7 +10,7 @@
     box-sizing: border-box;
     padding: 14px;
     gap: 9px;
-    background:white;
+    background: #ededed;
     border: 1px solid silver;
     border-radius: 9px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.17);
@@ -37,7 +37,7 @@
 .timecanvas-search-filters {display: grid; grid-template-columns: 1fr 1fr; gap: 8px;}
 .timecanvas-filter-group {display: flex; flex-direction: column; gap: 5px; min-width: 0;}
 .timecanvas-search-footer {display: flex; align-items: center; justify-content: space-between; gap: 8px;}
-.timecanvas-search-status {color: gray; font-size: 12px;}
+.timecanvas-search-status {color: black; font-size: 12px;}
 .timecanvas-clear-button {border: 0; background: transparent; color: darkblue; font-size: 12px; font-weight: 700; cursor: pointer;}
 .timecanvas-search-results {overflow-y: auto; min-height: 46px; max-height: 32vh; border-top: 1px solid black; padding-top: 5px;}
 .timecanvas-result-button {
@@ -47,7 +47,7 @@
     text-align: left;
     padding: 8px 3px;
     gap: 10px;
-    color: darkgray;
+    color: black;
     background: white;
     border: 0;
     border-bottom: 1px solid green;
@@ -57,12 +57,28 @@
 .timecanvas-result-picture {width: 45px; height: 45px; flex-shrink: 0; object-fit: cover; border-radius: 3px;}
 .timecanvas-result-text {min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12px;}
 .timecanvas-result-text strong {font-size: 13px;}
-.timecanvas-result-text > span {color: darkgray;}
-.timecanvas-no-results {padding: 14px 2px; font-size: 13px; color: darkgrey;}
+.timecanvas-result-text > span {color: black;}
+.timecanvas-no-results {padding: 14px 2px; font-size: 13px; color: black;}
 .timecanvas-details-window {width: min(680px, calc(100vw - 50px)); max-height: 86vh; padding: 0; border: 0; border-radius: 10px; box-shadow: 0 10px 35px rgba(0,0,0,0.25); font-family: Arial, sans-serif;}
 .timecanvas-details-window::backdrop {background: rgba(15,28,31,0.52);}
 .timecanvas-details-content {position: relative; padding: 22px; color: darkgray; overflow: auto; max-height: 80vh;}
-.timecanvas-details-close {position: absolute; right: 12px; top: 10px; padding: 6px 12px; border: 0; border-radius: 5px; color: white; background: darkgray; cursor: pointer;}
+.timecanvas-details-close {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    color: white;
+    background: #b91c1c;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
 .timecanvas-details-title {font-size: 22px; margin: 0 30px 6px 0;}
 .timecanvas-details-artist {margin: 0 0 16px; color: darkblue;}
 .timecanvas-details-body {display: grid; grid-template-columns: minmax(140px, 1fr) 1.5fr; gap: 20px;}

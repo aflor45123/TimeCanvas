@@ -18,6 +18,7 @@ const map = L.map("map", {
     zoomSnap: 0,
 }).fitBounds(worldBounds);
 
+map.zoomControl.setPosition("topright");
 map.setMinZoom(map.getZoom());
 
 fetch("./world-countries.geojson")
@@ -120,6 +121,15 @@ function createArtworkPopup(artwork) {
         artist,
         location,
     );
+
+    const moreInformation = document.createElement("button");
+    moreInformation.type = "button";
+    moreInformation.className = "art-popup-more";
+    moreInformation.textContent = "More information";
+    moreInformation.addEventListener("click", () => {
+        showingTheSelectedArtworkInformationTimeCanvas(artwork, false);
+    });
+    info.appendChild(moreInformation);
 
     container.appendChild(info);
 

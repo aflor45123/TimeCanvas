@@ -143,7 +143,7 @@ function showingTheArtworkSearchResultsTimeCanvas() {
         gettingTheSearchResultsTimeCanvas.appendChild(gettingTheArtworkResultButtonTimeCanvas);
     }
 }
-function showingTheSelectedArtworkInformationTimeCanvas(gettingTheArtworkToShowTimeCanvas) {
+function showingTheSelectedArtworkInformationTimeCanvas(gettingTheArtworkToShowTimeCanvas, focusMap = true) {
     let gettingTheArtworkShortDescriptionTimeCanvas = "";
     gettingTheCurrentArtworkFromSearchTimeCanvas = gettingTheArtworkToShowTimeCanvas;
     gettingTheArtworkDetailsTitleTimeCanvas.textContent = gettingTheArtworkToShowTimeCanvas.title;
@@ -157,7 +157,7 @@ function showingTheSelectedArtworkInformationTimeCanvas(gettingTheArtworkToShowT
     gettingTheArtworkShortDescriptionTimeCanvas = String(gettingTheArtworkToShowTimeCanvas.short_description || "");
     gettingTheArtworkShortDescriptionTimeCanvas = gettingTheArtworkShortDescriptionTimeCanvas.replace(/<\/?em>/gi, "");
     gettingTheArtworkDetailsDescriptionTimeCanvas.textContent = gettingTheArtworkShortDescriptionTimeCanvas;
-    const showDetails = window.dispatchEvent(new CustomEvent("timecanvas:artwork-selected", {
+    const showDetails = !focusMap || window.dispatchEvent(new CustomEvent("timecanvas:artwork-selected", {
         cancelable: true,
         detail: { artwork: gettingTheArtworkToShowTimeCanvas }
     }));
