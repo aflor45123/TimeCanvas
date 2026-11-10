@@ -5,7 +5,12 @@ const artworkCoordinates = {
     28067: [41.3851, 2.1734],    // The Old Guitarist
     27992: [48.8738, 2.9530],    // La Grande Jatte
     6565: [41.9779, -91.6656],   // American Gothic
-    20684: [48.8838, 2.3130]    // Paris Street; Rainy Day
+    20684: [48.8838, 2.3130],    // Paris Street; Rainy Day
+    95998: [52.3779, 4.8970], // Old Man with a Gold Chain
+    80607: [48.8738, 3.1760],  // Van Gogh Self-Portrait
+    15468: [41.3851, 2.1734],  // Saint George and the Dragon
+    87479: [39.8581, -4.022], // The Assumption of the Virgin
+    88977: [35.0116, 135.7683] // Evening Snow
 };
 
 const map = L.map("map", {

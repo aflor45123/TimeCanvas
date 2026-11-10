@@ -11,7 +11,12 @@ const artworkIds = [
     28067,  // The Old Guitarist
     27992,  // A Sunday on La Grande Jatte
     6565,   // American Gothic
-    20684   // Paris Street; Rainy Day
+    20684,   // Paris Street; Rainy Day
+    87479,   // The Assumption of the Virgin
+    80607,   // Self-Portrait
+    15468,   // Saint George and the Dragon
+    95998,   // Old Man with a Gold Chain
+    88977    // Evening Snow on a Floss Shaper
 ];
 
 // Fields we want from the API
@@ -28,7 +33,6 @@ const fields = [
     "description",
     "short_description",
     "image_id",
-    "is_public_domain",
     "web_url"
 ];
 
