@@ -5,12 +5,59 @@
     <title>TimeCanvas</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="searchbar.css">
 </head>
 <body>
     <header class="top-box">
         <h1>TimeCanvas</h1>
-    </header> 
+    </header>
+
+    <section class="timecanvas-search-panel" aria-label="Search artworks">
+        <h2 class="timecanvas-search-heading">Explore Artworks</h2>
+        <label class="timecanvas-search-label" for="timecanvasSearchInput">Search by artwork, artist, style, or location</label>
+        <input class="timecanvas-search-input" type="search" id="timecanvasSearchInput"
+               placeholder="Try Picasso, Paris, or Nighthawks" autocomplete="off">
+        <div class="timecanvas-search-filters">
+            <div class="timecanvas-filter-group">
+                <label class="timecanvas-search-label" for="timecanvasStyleFilter">Art Style</label>
+                <select class="timecanvas-search-filter" id="timecanvasStyleFilter">
+                    <option value="">All styles</option>
+                </select>
+            </div>
+            <div class="timecanvas-filter-group">
+                <label class="timecanvas-search-label" for="timecanvasPeriodFilter">Time Period</label>
+                <select class="timecanvas-search-filter" id="timecanvasPeriodFilter">
+                    <option value="">All centuries</option>
+                </select>
+            </div>
+        </div>
+        <div class="timecanvas-search-footer">
+            <span class="timecanvas-search-status" id="timecanvasSearchStatus" role="status" aria-live="polite">Loading artworks...</span>
+            <button class="timecanvas-clear-button" id="timecanvasClearSearch" type="button">Clear filters</button>
+        </div>
+        <div class="timecanvas-search-results" id="timecanvasSearchResults" aria-label="Artwork search results"></div>
+    </section>
+
     <main id="map" aria-label="Art history map"></main>
+
+    <dialog class="timecanvas-details-window" id="timecanvasArtworkDetails" aria-labelledby="timecanvasDetailsTitle">
+        <div class="timecanvas-details-content">
+            <button class="timecanvas-details-close" id="timecanvasCloseDetails" type="button" aria-label="Close artwork information">Close</button>
+            <h2 class="timecanvas-details-title" id="timecanvasDetailsTitle"></h2>
+            <p class="timecanvas-details-artist" id="timecanvasDetailsArtist"></p>
+            <div class="timecanvas-details-body">
+                <img class="timecanvas-details-image" id="timecanvasDetailsImage" alt="">
+                <dl class="timecanvas-details-info">
+                    <div><dt>Year</dt><dd id="timecanvasDetailsDate"></dd></div>
+                    <div><dt>Style</dt><dd id="timecanvasDetailsStyle"></dd></div>
+                    <div><dt>Place of origin</dt><dd id="timecanvasDetailsLocation"></dd></div>
+                    <div><dt>Medium</dt><dd id="timecanvasDetailsMedium"></dd></div>
+                </dl>
+            </div>
+            <p class="timecanvas-details-description" id="timecanvasDetailsDescription"></p>
+        </div>
+    </dialog>
+
     <footer class="bottom-box">
         <div class="timeline-container">
             <h2>Explore Art History</h2>
@@ -58,6 +105,7 @@
     </footer>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="internal.js"></script>
+    <script src="searchbar.js"></script>
     <script src="timeline.js"></script>
 </body>
 </html>
