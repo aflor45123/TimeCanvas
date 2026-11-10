@@ -121,40 +121,84 @@ function createArtworkPopup(artwork) {
     return container;
 }
 
-// Load artwork data and generate markers
-async function loadArtworks() {
-    try {
-        const response = await fetch("./data/artworks.json");
 
+
+// Timeline artwork filtering
+
+const timelineArtworkLayer = L.layerGroup().addTo(map);
+
+let artworks = [];
+let selectedStartYear = 1500;
+let selectedEndYear = 1599;
+
+// Load artwork data
+fetch("./data/artworks.json")
+    .then(response => {
         if (!response.ok) {
-            throw new Error(
-                `Could not load artworks.json: ${response.status}`
-            );
+            throw new Error("Could not load artwork data");
+        }
+        return response.json();
+    })
+    .then(data => {
+        artworks = data;
+        displayArtworks(selectedStartYear, selectedEndYear);
+    })
+    .catch(error => console.error("Artwork loading error:", error));
+
+// Filter artworks by selected century
+
+function displayArtworks(startYear, endYear) {
+    // Remove markers from the previously selected century
+    timelineArtworkLayer.clearLayers();
+
+    // Find artworks created during the selected century
+    const matchingArtworks = artworks.filter(artwork => {
+        const artworkStart = Number(artwork.date_start);
+        const artworkEnd = Number(artwork.date_end);
+
+        return artwork.date_start != null &&
+            artwork.date_end != null &&
+            Number.isFinite(artworkStart) &&
+            Number.isFinite(artworkEnd) &&
+            artworkStart <= endYear &&
+            artworkEnd >= startYear;
+    });
+
+    console.log(
+        `Showing ${matchingArtworks.length} artworks from ${startYear} to ${endYear}`
+    );
+
+    // Create map markers for matching artworks
+    matchingArtworks.forEach(artwork => {
+        const coordinates = artworkCoordinates[artwork.id];
+
+        // Skip artworks without mapped coordinates
+        if (!coordinates) {
+            console.warn("Missing coordinates:", artwork.title);
+            return;
         }
 
-        const artworks = await response.json();
+        const marker = L.marker(coordinates)
+            .addTo(timelineArtworkLayer);
 
-        artworks.forEach(artwork => {
-            const coordinates = artworkCoordinates[artwork.id];
+        marker.bindPopup(
+            createArtworkPopup(artwork),
+            {
+                maxWidth: 350,
+                autoPanPaddingTopLeft: [12, 24],
+                autoPanPaddingBottomRight: [12, 12]
+            }
+        );
 
-            const marker = L.marker(coordinates)
-                .addTo(map);
-
-            marker.bindPopup(
-                createArtworkPopup(artwork),
-                {
-                    maxWidth: 350,
-                    autoPanPaddingTopLeft: [12, 24],
-                    autoPanPaddingBottomRight: [12, 12]
-                }
-            );
-            marker.bindTooltip(artwork.title);
-
-        });
-
-    } catch (error) {
-        console.error("Artwork loading error:", error);
-    }
+        marker.bindTooltip(artwork.title);
+    });
 }
 
-loadArtworks();
+
+// Listen for timeline changes
+document.addEventListener("timelineChange", function(event) {
+    selectedStartYear = event.detail.startYear;
+    selectedEndYear = event.detail.endYear;
+
+    displayArtworks(selectedStartYear, selectedEndYear);
+});

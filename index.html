@@ -12,9 +12,52 @@
     </header> 
     <main id="map" aria-label="Art history map"></main>
     <footer class="bottom-box">
-        <p>*Timeline here*</p>
+        <div class="timeline-container">
+            <h2>Explore Art History</h2>
+    
+            <div class="timeline-controls">
+                <button id="previous-century" type="button"
+                        aria-label="Previous century">
+                    &#10094;
+                </button>
+    
+                <div class="timeline-main">
+                    <div class="timeline-labels">
+                        <span id="start-year">1000</span>
+                        <span id="selected-year">1500s</span>
+                        <span id="end-year">2000</span>
+                    </div>
+    
+                    <input
+                        type="range"
+                        id="timeline-slider"
+                        min="1000"
+                        max="1900"
+                        step="100"
+                        value="1500"
+                        aria-label="Select historical century"
+                    >
+                </div>
+    
+                <button id="next-century" type="button"
+                        aria-label="Next century">
+                    &#10095;
+                </button>
+            </div>
+    
+            <div class="timeline-navigation">
+                <button id="previous-millennium" type="button">
+                    -1000 Years
+                </button>
+    
+                <button id="next-millennium" type="button">
+                    +1000 Years
+                </button>
+            </div>
+        </div>
     </footer>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="internal.js"></script>
+    <script src="timeline.js"></script>
 </body>
 </html>
