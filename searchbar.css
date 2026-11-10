@@ -77,3 +77,32 @@
     .timecanvas-details-body {grid-template-columns: 1fr;}
     .timecanvas-details-image {max-height: 230px;}
 }
+.map-workspace {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.map-workspace .timecanvas-search-panel {
+    position: static;
+    width: min(350px, 34%);
+    max-height: none;
+}
+
+.map-workspace #map {
+    min-width: 0;
+}
+
+@media (max-width: 680px) {
+    .map-workspace {
+        flex-direction: column;
+    }
+
+    .map-workspace .timecanvas-search-panel {
+        width: 100%;
+    }
+
+    .map-workspace #map {
+        min-height: 50vh;
+    }
+}

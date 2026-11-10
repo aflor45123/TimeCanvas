@@ -132,6 +132,7 @@ function createArtworkPopup(artwork) {
 
 const timelineArtworkLayer = L.layerGroup().addTo(map);
 
+const artworkMarkers = new Map();
 let artworks = [];
 let selectedStartYear = 1500;
 let selectedEndYear = 1599;
@@ -155,6 +156,7 @@ fetch("./data/artworks.json")
 function displayArtworks(startYear, endYear) {
     // Remove markers from the previously selected century
     timelineArtworkLayer.clearLayers();
+    artworkMarkers.clear();
 
     // Find artworks created during the selected century
     const matchingArtworks = artworks.filter(artwork => {
@@ -196,6 +198,7 @@ function displayArtworks(startYear, endYear) {
         );
 
         marker.bindTooltip(artwork.title);
+        artworkMarkers.set(artwork.id, marker);
     });
 }
 

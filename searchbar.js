@@ -157,10 +157,13 @@ function showingTheSelectedArtworkInformationTimeCanvas(gettingTheArtworkToShowT
     gettingTheArtworkShortDescriptionTimeCanvas = String(gettingTheArtworkToShowTimeCanvas.short_description || "");
     gettingTheArtworkShortDescriptionTimeCanvas = gettingTheArtworkShortDescriptionTimeCanvas.replace(/<\/?em>/gi, "");
     gettingTheArtworkDetailsDescriptionTimeCanvas.textContent = gettingTheArtworkShortDescriptionTimeCanvas;
-    gettingTheArtworkDetailsWindowTimeCanvas.showModal();
-    window.dispatchEvent(new CustomEvent("timecanvas:artwork-selected", {
+    const showDetails = window.dispatchEvent(new CustomEvent("timecanvas:artwork-selected", {
+        cancelable: true,
         detail: { artwork: gettingTheArtworkToShowTimeCanvas }
     }));
+    if (showDetails) {
+        gettingTheArtworkDetailsWindowTimeCanvas.showModal();
+    }
 }
 async function loadingTheArtworksForTheSearchBarTimeCanvas() {
     let gettingTheResponseFromArtworksFileTimeCanvas = null;

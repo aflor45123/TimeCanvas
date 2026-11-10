@@ -96,5 +96,28 @@ nextMillennium.addEventListener("click", function () {
     }
 });
 
+window.addEventListener("timecanvas:artwork-selected", function (event) {
+    const artwork = event.detail.artwork;
+    const year = Number(artwork.date_start);
+
+    if (artwork.date_start == null || !Number.isFinite(year) ||
+        year < MIN_YEAR || year >= MAX_YEAR ||
+        !artworkCoordinates[artwork.id] ||
+        !artworks.some(record => record.id === artwork.id)) {
+        return;
+    }
+
+    currentYear = Math.floor(year / CENTURY_STEP) * CENTURY_STEP;
+    rangeStart = Math.floor(year / RANGE_SIZE) * RANGE_SIZE;
+    updateTimeline();
+
+    const marker = artworkMarkers.get(artwork.id);
+    if (marker) {
+        event.preventDefault();
+        map.setView(marker.getLatLng(), Math.max(map.getZoom(), 5));
+        marker.openPopup();
+    }
+});
+
 // Initialize timeline
 updateTimeline();
