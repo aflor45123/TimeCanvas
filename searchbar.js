@@ -17,6 +17,22 @@ const gettingTheArtworkDetailsDescriptionTimeCanvas = document.getElementById("t
 let gettingAllTheArtworksFromTheJsonFileTimeCanvas = [];
 let gettingTheArtworksAfterSearchingTimeCanvas = [];
 let gettingTheCurrentArtworkFromSearchTimeCanvas = null;
+const previousArtwork = document.getElementById("timecanvasPreviousArtwork");
+const nextArtwork = document.getElementById("timecanvasNextArtwork");
+
+function browseCenturyArtwork(direction) {
+    const ids = Array.from(artworkMarkers.keys());
+    const currentIndex = ids.indexOf(gettingTheCurrentArtworkFromSearchTimeCanvas?.id);
+    if (currentIndex < 0 || ids.length < 2) return;
+
+    const nextId = ids[(currentIndex + direction + ids.length) % ids.length];
+    const artwork = artworks.find(record => record.id === nextId);
+    showingTheSelectedArtworkInformationTimeCanvas(artwork, false);
+    gettingTheArtworkDetailsWindowTimeCanvas.querySelector(".timecanvas-details-content").scrollTop = 0;
+}
+
+previousArtwork.addEventListener("click", () => browseCenturyArtwork(-1));
+nextArtwork.addEventListener("click", () => browseCenturyArtwork(1));
 function makingTheSearchTextLowercaseTimeCanvas(gettingTheTextToChangeTimeCanvas) {
     let gettingTheLowercaseTextTimeCanvas = "";
     if (gettingTheTextToChangeTimeCanvas !== null && gettingTheTextToChangeTimeCanvas !== undefined) {
@@ -162,7 +178,13 @@ function showingTheSelectedArtworkInformationTimeCanvas(gettingTheArtworkToShowT
         detail: { artwork: gettingTheArtworkToShowTimeCanvas }
     }));
     if (showDetails) {
-        gettingTheArtworkDetailsWindowTimeCanvas.showModal();
+        const canBrowse = artworkMarkers.size > 1 &&
+            artworkMarkers.has(gettingTheArtworkToShowTimeCanvas.id);
+        previousArtwork.hidden = !canBrowse;
+        nextArtwork.hidden = !canBrowse;
+        if (!gettingTheArtworkDetailsWindowTimeCanvas.open) {
+            gettingTheArtworkDetailsWindowTimeCanvas.showModal();
+        }
     }
 }
 async function loadingTheArtworksForTheSearchBarTimeCanvas() {

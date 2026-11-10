@@ -61,7 +61,7 @@
 .timecanvas-no-results {padding: 14px 2px; font-size: 13px; color: black;}
 .timecanvas-details-window {width: min(680px, calc(100vw - 50px)); max-height: 86vh; padding: 0; border: 0; border-radius: 10px; box-shadow: 0 10px 35px rgba(0,0,0,0.25); font-family: Arial, sans-serif;}
 .timecanvas-details-window::backdrop {background: rgba(15,28,31,0.52);}
-.timecanvas-details-content {position: relative; padding: 22px; color: darkgray; overflow: auto; max-height: 80vh;}
+.timecanvas-details-content {position: relative; padding: 22px; color: black; overflow: auto; max-height: 80vh;}
 .timecanvas-details-close {
     position: absolute;
     right: 12px;
@@ -122,3 +122,24 @@
         min-height: 50vh;
     }
 }
+
+.timecanvas-details-content:has(.timecanvas-artwork-arrow:not([hidden])) {
+    padding-inline: 44px;
+}
+
+.timecanvas-artwork-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #24543d;
+    border-radius: 4px;
+    background: #24543d;
+    color: white;
+    cursor: pointer;
+}
+
+.timecanvas-artwork-arrow.previous { left: 6px; }
+.timecanvas-artwork-arrow.next { right: 6px; }
