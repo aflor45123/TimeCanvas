@@ -39,21 +39,26 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    width: 160px;
+    width: 300px;
 }
 .art-popup img {
     display: block;
-    width: 75%;
-    height: 90px;
+    width: 50%;
+    height: 50%;
     object-fit: contain;
     flex-shrink: 0;
 }
 .art-popup h2 {
-    margin: 10px 0 4px;
+    margin: 5px 0 8px;
     font-size: 18px;
 }
 .art-popup p {
     margin: 4px 0;
+}
+
+.art-popup .popup-label {
+    color: darkred;
+    font-weight: bold;
 }
 #map .leaflet-popup-content-wrapper {
     border-radius: 0;
