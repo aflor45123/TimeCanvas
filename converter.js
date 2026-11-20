@@ -8,7 +8,8 @@ const imageDirectory = path.join(__dirname, "images");
 const cachePath = path.join(__dirname, "data/location-cache.json");
 //used to retrieve coordinates
 const geocodingUrl = "https://nominatim.openstreetmap.org/search";
-const userAgent = "ArtOriginMap/1.0 (contact: alega@uic.edu)";
+//put in email only when running to retrieve coordinates, otherwise leave blank
+const userAgent = "ArtOriginMap/1.0 (contact: email@here)";
 
 // Fields we want from the API
 const fields = [
