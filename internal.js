@@ -1,21 +1,9 @@
 const worldBounds = [[-90, -180], [90, 180]];
 
-const artworkCoordinates = {
-    111628: [40.7128, -74.0060],  // Nighthawks
-    28067: [41.3851, 2.1734],    // The Old Guitarist
-    27992: [48.8738, 2.9530],    // La Grande Jatte
-    6565: [41.9779, -91.6656],   // American Gothic
-    20684: [48.8838, 2.3130],    // Paris Street; Rainy Day
-    95998: [52.3779, 4.8970], // Old Man with a Gold Chain
-    80607: [48.8738, 3.1760],  // Van Gogh Self-Portrait
-    15468: [41.3851, 2.1734],  // Saint George and the Dragon
-    87479: [39.8581, -4.022], // The Assumption of the Virgin
-    88977: [35.0116, 135.7683] // Evening Snow
-};
-
 const map = L.map("map", {
     crs: L.CRS.EPSG4326,
     zoomSnap: 0,
+    maxZoom: 17,
 }).fitBounds(worldBounds);
 
 map.zoomControl.setPosition("topright");
@@ -56,25 +44,6 @@ fetch("./world-countries.geojson")
         }).addTo(map);
     })
     .catch(error => console.error(error));
-
-/*const artworkPopup = `
-    <article class="art-popup">
-        <img src="images/sample-artwork.jpg" alt="Describe the artwork">
-        <div>
-            <h2>Artwork Title</h2>
-            <p>Artist Name</p>
-            <p>Florence, Italy</p>
-        </div>
-    </article>
-`;
-
-L.marker([43.7696, 11.2558])
-    .addTo(map)
-    .bindPopup(artworkPopup, {
-        maxWidth: 200,
-        autoPanPaddingTopLeft: [12, 24],
-        autoPanPaddingBottomRight: [12, 12]
-});*/
 
 // Create artwork popup content
 function createArtworkPopup(artwork) {
@@ -140,7 +109,10 @@ function createArtworkPopup(artwork) {
 
 // Timeline artwork filtering
 
-const timelineArtworkLayer = L.layerGroup().addTo(map);
+const timelineArtworkLayer = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: true
+}).addTo(map);
 
 const artworkMarkers = new Map();
 let artworks = [];
@@ -187,7 +159,7 @@ function displayArtworks(startYear, endYear) {
 
     // Create map markers for matching artworks
     matchingArtworks.forEach(artwork => {
-        const coordinates = artworkCoordinates[artwork.id];
+        const coordinates = artwork.coordinates;
 
         // Skip artworks without mapped coordinates
         if (!coordinates) {
@@ -195,8 +167,10 @@ function displayArtworks(startYear, endYear) {
             return;
         }
 
-        const marker = L.marker(coordinates)
-            .addTo(timelineArtworkLayer);
+        const marker = L.marker([
+            coordinates.latitude,
+            coordinates.longitude
+        ]).addTo(timelineArtworkLayer);
 
         marker.bindPopup(
             createArtworkPopup(artwork),

@@ -102,7 +102,7 @@ window.addEventListener("timecanvas:artwork-selected", function (event) {
 
     if (artwork.date_start == null || !Number.isFinite(year) ||
         year < MIN_YEAR || year >= MAX_YEAR ||
-        !artworkCoordinates[artwork.id] ||
+        !artwork.coordinates ||
         !artworks.some(record => record.id === artwork.id)) {
         return;
     }
@@ -114,8 +114,10 @@ window.addEventListener("timecanvas:artwork-selected", function (event) {
     const marker = artworkMarkers.get(artwork.id);
     if (marker) {
         event.preventDefault();
-        map.setView(marker.getLatLng(), Math.max(map.getZoom(), 5));
-        marker.openPopup();
+        timelineArtworkLayer.zoomToShowLayer(marker, () => {
+            map.setView(marker.getLatLng(), Math.max(map.getZoom(), 10));
+            marker.openPopup();
+        });
     }
 });
 

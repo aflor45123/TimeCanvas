@@ -1,0 +1,116 @@
+{
+    "france": {
+        "latitude": 46.2276,
+        "longitude": 2.2137,
+        "resolved_name": "France",
+        "precision": "country"
+    },
+    "paris": {
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "resolved_name": "Paris, France",
+        "precision": "city"
+    },
+    "italy": {
+        "latitude": 42.6384261,
+        "longitude": 12.674297,
+        "resolved_name": "Italia",
+        "precision": "country"
+    },
+    "florence": {
+        "latitude": 43.7697955,
+        "longitude": 11.2556404,
+        "resolved_name": "Firenze, Toscana, Italia",
+        "precision": "city"
+    },
+    "holland": {
+        "latitude": 52.2434979,
+        "longitude": 5.6343227,
+        "resolved_name": "Nederland",
+        "precision": "country"
+    },
+    "cedar rapids": {
+        "latitude": 41.9758872,
+        "longitude": -91.6704053,
+        "resolved_name": "Cedar Rapids, Linn County, Iowa, United States",
+        "precision": "city"
+    },
+    "spain": {
+        "latitude": 39.3260685,
+        "longitude": -4.8379791,
+        "resolved_name": "España",
+        "precision": "country"
+    },
+    "netherlands": {
+        "latitude": 52.2434979,
+        "longitude": 5.6343227,
+        "resolved_name": "Nederland",
+        "precision": "country"
+    },
+    "greece": {
+        "latitude": 38.9953683,
+        "longitude": 21.9877132,
+        "resolved_name": "Ελλάς",
+        "precision": "country"
+    },
+    "japan": {
+        "latitude": 36.5748441,
+        "longitude": 139.2394179,
+        "resolved_name": "日本",
+        "precision": "country"
+    },
+    "united states": {
+        "latitude": 39.7837304,
+        "longitude": -100.445882,
+        "resolved_name": "United States",
+        "precision": "country"
+    },
+    "switzerland": {
+        "latitude": 46.7985624,
+        "longitude": 8.2319736,
+        "resolved_name": "Schweiz / Suisse / Svizzera / Svizra",
+        "precision": "country"
+    },
+    "saint-rémy-de-provence": {
+        "latitude": 43.7885782,
+        "longitude": 4.8317498,
+        "resolved_name": "Saint-Rémy-de-Provence, Arles, Bouches-du-Rhône, Provence-Alpes-Côte d'Azur, France métropolitaine, 13210, France",
+        "precision": "town"
+    },
+    "belgium": {
+        "latitude": 50.6402809,
+        "longitude": 4.6667145,
+        "resolved_name": "België / Belgique / Belgien",
+        "precision": "country"
+    },
+    "new york city": {
+        "latitude": 40.7127281,
+        "longitude": -74.0060152,
+        "resolved_name": "New York, United States",
+        "precision": "city"
+    },
+    "florida": {
+        "latitude": 27.7567667,
+        "longitude": -81.4639835,
+        "resolved_name": "Florida, United States",
+        "precision": "state"
+    },
+    "new mexico": {
+        "latitude": 34.5802074,
+        "longitude": -105.996047,
+        "resolved_name": "New Mexico, United States",
+        "precision": "state"
+    },
+    "norway": {
+        "latitude": 61.1529386,
+        "longitude": 8.7876653,
+        "resolved_name": "Norge",
+        "precision": "country"
+    },
+    "united kingdom": {
+        "latitude": 54.7023545,
+        "longitude": -3.2765753,
+        "resolved_name": "United Kingdom",
+        "precision": "country"
+    }
+}
