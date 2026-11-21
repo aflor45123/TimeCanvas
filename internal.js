@@ -1,196 +1,345 @@
-const worldBounds = [[-90, -180], [90, 180]];
 
-const map = L.map("map", {
+/* TimeCanvas — Interactive Art History Map */
+
+// Initialize Leaflet map.
+const worldBounds = [
+    [-90, -180],
+    [90, 180]
+  ];
+  
+  const map = L.map("map", {
     crs: L.CRS.EPSG4326,
     zoomSnap: 0,
-    maxZoom: 17,
-}).fitBounds(worldBounds);
-
-map.zoomControl.setPosition("topright");
-map.setMinZoom(map.getZoom());
-
-fetch("./world-countries.geojson")
+    maxZoom: 17
+  }).fitBounds(worldBounds);
+  
+  map.zoomControl.setPosition("topright");
+  map.setMinZoom(map.getZoom());
+  
+  // Load country boundaries.
+  fetch("./world-countries.geojson")
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Could not load world-countries.geojson (${response.status})');
-        }
-        return response.json();
+      if (!response.ok) {
+        throw new Error("Could not load world map");
+      }
+      return response.json();
     })
     .then(countries => {
-        L.geoJSON(countries, {
-            style: {
-                color: "#797979",
-                weight: 1,
-                fillColor: "#ffffff",
-                fillOpacity: 1
-            },
-            onEachFeature(feature, layer) {
-                const name = feature.properties.ADMIN;
-                layer.bindTooltip(name, {sticky: true});
-                layer.bindPopup(name);
-
-                /*const country = feature.properties;
-
-                if (country.LABELRANK <= 3) {
-                    layer.bindTooltip(country.ADMIN, {
-                        permanent: true,
-                        direction: "center",
-                        className: "country-label"
-                    }).openTooltip([country.LABEL_Y, country.LABEL_X]);
-                } else {
-                    layer.bindTooltip(country.ADMIN, {sticky: true});
-                }*/
-            }
-        }).addTo(map);
+      L.geoJSON(countries, {
+        style: {
+          color: "#797979",
+          weight: 1,
+          fillColor: "#ffffff",
+          fillOpacity: 1
+        },
+        onEachFeature(feature, layer) {
+          const name =
+            feature.properties?.ADMIN ||
+            feature.properties?.name ||
+            "Unknown country";
+  
+          layer.bindTooltip(name, {
+            sticky: true
+          });
+        }
+      }).addTo(map);
     })
-    .catch(error => console.error(error));
-
-// Create artwork popup content
-function createArtworkPopup(artwork) {
+    .catch(error => {
+      console.error("Map loading error:", error);
+    });
+  
+  // Artwork marker layer.
+  const timelineArtworkLayer =
+    L.markerClusterGroup({
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true
+    }).addTo(map);
+  
+  const artworkMarkers = new Map();
+  
+  // State.
+  let artworks = [];
+  let selectedStartYear = 1000;
+  let selectedEndYear = 2026;
+  let searchArtworkIds = null;
+  
+  // Artwork detail elements.
+  const artworkDetailPanel =
+    document.getElementById("artwork-detail-panel");
+  
+  const artworkDetailContent =
+    document.getElementById("artwork-detail-content");
+  
+  const closeArtworkDetails =
+    document.getElementById("close-artwork-details");
+  
+  // Close artwork details.
+  closeArtworkDetails.addEventListener("click", () => {
+    artworkDetailPanel.hidden = true;
+  });
+  
+  // Display artwork information.
+  function showArtworkDetails(artwork) {
+    artworkDetailContent.replaceChildren();
+  
+    const title = document.createElement("h2");
+    title.textContent =
+      artwork.title || "Untitled artwork";
+  
+    artworkDetailContent.appendChild(title);
+  
+    if (artwork.image_url) {
+      const image = document.createElement("img");
+      image.src = artwork.image_url;
+      image.alt = artwork.title || "Artwork image";
+      image.loading = "lazy";
+  
+      artworkDetailContent.appendChild(image);
+    }
+  
+    const fields = [
+      ["Artist", artwork.artist],
+      ["Start year", artwork.date_start],
+      ["End year", artwork.date_end],
+      ["Art style", artwork.style],
+      ["Place of origin", artwork.place_of_origin],
+      ["Medium", artwork.medium]
+    ];
+  
+    fields.forEach(([label, value]) => {
+      if (value === undefined ||
+          value === null ||
+          value === "") {
+        return;
+      }
+  
+      const paragraph = document.createElement("p");
+      paragraph.textContent = `${label}: ${value}`;
+  
+      artworkDetailContent.appendChild(paragraph);
+    });
+  
+    if (artwork.description) {
+      const description = document.createElement("p");
+      description.textContent = artwork.description;
+  
+      artworkDetailContent.appendChild(description);
+    }
+  
+    artworkDetailPanel.hidden = false;
+  }
+  
+  // Create artwork marker popup.
+  function createArtworkPopup(artwork) {
     const container = document.createElement("article");
     container.className = "art-popup";
-
-    // Artwork image
+  
     if (artwork.image_url) {
-        const image = document.createElement("img");
-
-        image.src = artwork.image_url;
-        image.alt = artwork.title || "Artwork";
-        image.loading = "lazy";
-
-        container.appendChild(image);
+      const image = document.createElement("img");
+      image.src = artwork.image_url;
+      image.alt = artwork.title || "Artwork";
+      image.loading = "lazy";
+  
+      container.appendChild(image);
     }
-
-    // Artwork information
-    const info = document.createElement("div");
-
+  
+    const information = document.createElement("div");
+  
     const title = document.createElement("h2");
     title.textContent = artwork.title || "Untitled";
-
+  
     const artist = document.createElement("p");
-    const artistLabel = document.createElement("span");
-    artistLabel.textContent = "Artist: ";
-    artistLabel.className = "popup-label";
-    artist.append(
-        artistLabel,
-        artwork.artist || "Unknown artist"
-    );
-
-    const location = document.createElement("p");
-    const locationLabel = document.createElement("span");
-    locationLabel.textContent = "Location: ";
-    locationLabel.className = "popup-label";
-    location.append(
-        locationLabel,
-        artwork.place_of_origin || "Unknown location"
-    );
-
-    info.append(
-        title,
-        artist,
-        location,
-    );
-
-    const moreInformation = document.createElement("button");
-    moreInformation.type = "button";
-    moreInformation.className = "art-popup-more";
-    moreInformation.textContent = "More information";
-    moreInformation.addEventListener("click", () => {
-        showingTheSelectedArtworkInformationTimeCanvas(artwork, false);
+    artist.textContent =
+      `Artist: ${artwork.artist || "Unknown"}`;
+  
+    const year = document.createElement("p");
+    year.textContent =
+      `Year: ${artwork.date_start ?? "Unknown"}`;
+  
+    const moreButton = document.createElement("button");
+    moreButton.type = "button";
+    moreButton.className = "art-popup-more";
+    moreButton.textContent = "More Information";
+  
+    moreButton.addEventListener("click", () => {
+      showArtworkDetails(artwork);
     });
-    info.appendChild(moreInformation);
-
-    container.appendChild(info);
-
+  
+    information.append(
+      title,
+      artist,
+      year,
+      moreButton
+    );
+  
+    container.appendChild(information);
+  
     return container;
-}
-
-
-
-// Timeline artwork filtering
-
-const timelineArtworkLayer = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    spiderfyOnMaxZoom: true
-}).addTo(map);
-
-const artworkMarkers = new Map();
-let artworks = [];
-let selectedStartYear = 1500;
-let selectedEndYear = 1599;
-
-// Load artwork data
-fetch("./data/artworks.json")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Could not load artwork data");
-        }
-        return response.json();
-    })
-    .then(data => {
-        artworks = data;
-        displayArtworks(selectedStartYear, selectedEndYear);
-    })
-    .catch(error => console.error("Artwork loading error:", error));
-
-// Filter artworks by selected century
-
-function displayArtworks(startYear, endYear) {
-    // Remove markers from the previously selected century
+  }
+  
+  // Check whether artwork dates overlap the selected range.
+  function artworkMatchesTimeline(artwork) {
+    if (
+      artwork.date_start == null ||
+      artwork.date_end == null ||
+      artwork.date_start === "" ||
+      artwork.date_end === ""
+    ) {
+      return false;
+    }
+  
+    const start = Number(artwork.date_start);
+    const end = Number(artwork.date_end);
+  
+    if (
+      !Number.isFinite(start) ||
+      !Number.isFinite(end) ||
+      start > end
+    ) {
+      return false;
+    }
+  
+    return (
+      start <= selectedEndYear &&
+      end >= selectedStartYear
+    );
+  }
+  
+  // Update visible artwork markers.
+  function displayArtworks() {
     timelineArtworkLayer.clearLayers();
     artworkMarkers.clear();
-
-    // Find artworks created during the selected century
+  
     const matchingArtworks = artworks.filter(artwork => {
-        const artworkStart = Number(artwork.date_start);
-        const artworkEnd = Number(artwork.date_end);
-
-        return artwork.date_start != null &&
-            artwork.date_end != null &&
-            Number.isFinite(artworkStart) &&
-            Number.isFinite(artworkEnd) &&
-            artworkStart <= endYear &&
-            artworkEnd >= startYear;
+      const matchesTimeline =
+        artworkMatchesTimeline(artwork);
+  
+      const matchesSearch =
+        searchArtworkIds === null ||
+        searchArtworkIds.has(String(artwork.id));
+  
+      return matchesTimeline && matchesSearch;
     });
-
-    console.log(
-        `Showing ${matchingArtworks.length} artworks from ${startYear} to ${endYear}`
-    );
-
-    // Create map markers for matching artworks
+  
     matchingArtworks.forEach(artwork => {
-        const coordinates = artwork.coordinates;
-
-        // Skip artworks without mapped coordinates
-        if (!coordinates) {
-            console.warn("Missing coordinates:", artwork.title);
-            return;
-        }
-
-        const marker = L.marker([
-            coordinates.latitude,
-            coordinates.longitude
-        ]).addTo(timelineArtworkLayer);
-
-        marker.bindPopup(
-            createArtworkPopup(artwork),
-            {
-                maxWidth: 350,
-                autoPanPaddingTopLeft: [12, 24],
-                autoPanPaddingBottomRight: [12, 12]
-            }
-        );
-
-        marker.bindTooltip(artwork.title);
-        artworkMarkers.set(artwork.id, marker);
+      const coordinates = artwork.coordinates;
+  
+      if (!coordinates) return;
+  
+      const lat = Number(coordinates.latitude);
+      const lng = Number(coordinates.longitude);
+  
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng) ||
+        Math.abs(lat) > 90 ||
+        Math.abs(lng) > 180
+      ) {
+        return;
+      }
+  
+      const marker = L.marker([lat, lng]);
+  
+      marker.bindPopup(
+        createArtworkPopup(artwork),
+        { maxWidth: 350 }
+      );
+  
+      marker.bindTooltip(
+        artwork.title || "Artwork"
+      );
+  
+      timelineArtworkLayer.addLayer(marker);
+      artworkMarkers.set(artwork.id, marker);
     });
-}
-
-
-// Listen for timeline changes
-document.addEventListener("timelineChange", function(event) {
-    selectedStartYear = event.detail.startYear;
-    selectedEndYear = event.detail.endYear;
-
-    displayArtworks(selectedStartYear, selectedEndYear);
-});
+  
+    document.dispatchEvent(
+      new CustomEvent("timelineResultsUpdated", {
+        detail: {
+          count: matchingArtworks.length,
+          mappedCount: artworkMarkers.size
+        }
+      })
+    );
+  }
+  
+  // Listen for timeline filtering.
+  document.addEventListener(
+    "timelineChange",
+    event => {
+      selectedStartYear = event.detail.startYear;
+      selectedEndYear = event.detail.endYear;
+  
+      displayArtworks();
+    }
+  );
+  
+  // Listen for search filtering.
+  window.addEventListener(
+    "timecanvas:search-changed",
+    event => {
+      const results = event.detail?.artworks;
+  
+      if (!Array.isArray(results)) {
+        searchArtworkIds = null;
+      } else {
+        searchArtworkIds = new Set(
+          results.map(artwork => String(artwork.id))
+        );
+      }
+  
+      displayArtworks();
+    }
+  );
+  
+  // Load artwork collection.
+  fetch("./data/artworks.json")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          `Could not load artworks: ${response.status}`
+        );
+      }
+  
+      return response.json();
+    })
+    .then(data => {
+      if (!Array.isArray(data)) {
+        throw new Error(
+          "artworks.json must contain an array"
+        );
+      }
+  
+      artworks = data;
+  
+      // Render the initial full collection.
+      displayArtworks();
+  
+      // Notify other components.
+      document.dispatchEvent(
+        new CustomEvent("timecanvas:artworks-loaded", {
+          detail: {
+            artworks: artworks
+          }
+        })
+      );
+  
+      window.dispatchEvent(
+        new CustomEvent("timecanvas:artworks-loaded", {
+          detail: {
+            artworks: artworks
+          }
+        })
+      );
+    })
+    .catch(error => {
+      console.error("Artwork loading error:", error);
+  
+      const status =
+        document.getElementById("timecanvasSearchStatus");
+  
+      if (status) {
+        status.textContent = "Unable to load artworks.";
+      }
+    });
+  

@@ -1,125 +1,247 @@
-// TimeCanvas Timeline
 
-const timelineSlider = document.getElementById("timeline-slider");
-const selectedYear = document.getElementById("selected-year");
-const startYear = document.getElementById("start-year");
-const endYear = document.getElementById("end-year");
+/* TimeCanvas — Single Year and Custom Date Range */
 
-const previousCentury = document.getElementById("previous-century");
-const nextCentury = document.getElementById("next-century");
+const MIN_YEAR = 1000;
+const MAX_YEAR = 2026;
 
-const previousMillennium = document.getElementById("previous-millennium");
-const nextMillennium = document.getElementById("next-millennium");
+const centurySelect =
+  document.getElementById("century-select");
+const yearFrom =
+  document.getElementById("year-from");
+const yearTo =
+  document.getElementById("year-to");
+const selectedYear =
+  document.getElementById("selected-year");
+const timelineCount =
+  document.getElementById("timeline-count");
+const resetTimeline =
+  document.getElementById("reset-timeline");
+const showArtworksButton =
+  document.getElementById("show-artworks");
 
-// Timeline configuration
-const MIN_YEAR = 0;
-const MAX_YEAR = 3000;
-const RANGE_SIZE = 1000;
-const CENTURY_STEP = 100;
+let selectedStartYearTimeline = MIN_YEAR;
+let selectedEndYearTimeline = MAX_YEAR;
 
-let rangeStart = 1000;
-let currentYear = 1500;
-
-// Update timeline display
+// Publish the applied date range to the map.
 function updateTimeline() {
-    timelineSlider.min = rangeStart;
-    timelineSlider.max = rangeStart + RANGE_SIZE - CENTURY_STEP;
-    timelineSlider.value = currentYear;
+  const start = selectedStartYearTimeline;
+  const end = selectedEndYearTimeline;
 
-    startYear.textContent = rangeStart;
-    endYear.textContent = rangeStart + RANGE_SIZE;
+  selectedYear.textContent = start === end
+    ? `Selected year: ${start}`
+    : `Selected period: ${start}–${end}`;
 
-    selectedYear.textContent = `${currentYear}s`;
+  resetTimeline.disabled =
+    start === MIN_YEAR && end === MAX_YEAR;
 
-    previousCentury.disabled = currentYear <= MIN_YEAR;
-    nextCentury.disabled = currentYear >= MAX_YEAR - CENTURY_STEP;
-
-    previousMillennium.disabled = rangeStart <= MIN_YEAR;
-    nextMillennium.disabled = rangeStart + RANGE_SIZE >= MAX_YEAR;
-
-    // Notify the map when a century is selected
-    document.dispatchEvent(new CustomEvent("timelineChange", {
-        detail: {
-            startYear: currentYear,
-            endYear: currentYear + 99
-        }
-    }));
+  document.dispatchEvent(
+    new CustomEvent("timelineChange", {
+      detail: {
+        startYear: start,
+        endYear: end
+      }
+    })
+  );
 }
 
-// Move the slider
-timelineSlider.addEventListener("input", function () {
-    currentYear = Number(this.value);
-    updateTimeline();
-});
+// Validate and apply user-entered dates.
+function showAvailableArtworks() {
+  const fromText = yearFrom.value.trim();
+  const toText = yearTo.value.trim();
 
-// Previous century
-previousCentury.addEventListener("click", function () {
-    if (currentYear > MIN_YEAR) {
-        currentYear -= CENTURY_STEP;
+  if (fromText === "" && toText === "") {
+    resetTimelineSelection();
+    return;
+  }
 
-        if (currentYear < rangeStart) {
-            rangeStart -= RANGE_SIZE;
-        }
+  if (fromText === "") {
+    selectedYear.textContent =
+      "Please enter a year in the first field.";
+    return;
+  }
 
-        updateTimeline();
+  const start = Number(fromText);
+  const end = toText === ""
+    ? start
+    : Number(toText);
+
+  if (
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start < MIN_YEAR ||
+    start > MAX_YEAR ||
+    end < MIN_YEAR ||
+    end > MAX_YEAR ||
+    start > end
+  ) {
+    selectedYear.textContent =
+      `Enter a valid year or range between ${MIN_YEAR} and ${MAX_YEAR}.`;
+    return;
+  }
+
+  selectedStartYearTimeline = start;
+  selectedEndYearTimeline = end;
+
+  centurySelect.value = "";
+  updateTimeline();
+}
+
+// Apply only when the button is clicked.
+showArtworksButton.addEventListener(
+  "click",
+  showAvailableArtworks
+);
+
+// Enter key can also submit a completed range.
+[yearFrom, yearTo].forEach(input => {
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      showAvailableArtworks();
     }
+  });
 });
 
-// Next century
-nextCentury.addEventListener("click", function () {
-    if (currentYear < MAX_YEAR - CENTURY_STEP) {
-        currentYear += CENTURY_STEP;
+// Populate the century dropdown.
+function populateCenturies() {
+  centurySelect.replaceChildren(
+    new Option("All dates / custom range", "")
+  );
 
-        if (currentYear >= rangeStart + RANGE_SIZE) {
-            rangeStart += RANGE_SIZE;
-        }
+  for (let year = MIN_YEAR; year <= 2000; year += 100) {
+    const centuryNumber = year / 100 + 1;
 
-        updateTimeline();
+    const suffix =
+      centuryNumber % 100 >= 11 &&
+      centuryNumber % 100 <= 13
+        ? "th"
+        : centuryNumber % 10 === 1
+          ? "st"
+          : centuryNumber % 10 === 2
+            ? "nd"
+            : centuryNumber % 10 === 3
+              ? "rd"
+              : "th";
+
+    centurySelect.add(
+      new Option(
+        `${year}s (${centuryNumber}${suffix} century)`,
+        String(year)
+      )
+    );
+  }
+}
+
+// Selecting a century filters immediately.
+centurySelect.addEventListener("change", () => {
+  if (centurySelect.value === "") {
+    resetTimelineSelection();
+    return;
+  }
+
+  const century = Number(centurySelect.value);
+
+  selectedStartYearTimeline = century;
+  selectedEndYearTimeline = Math.min(
+    century + 99,
+    MAX_YEAR
+  );
+
+  yearFrom.value = selectedStartYearTimeline;
+  yearTo.value = selectedEndYearTimeline;
+
+  updateTimeline();
+});
+
+// Restore the full 1000–2026 period.
+function resetTimelineSelection() {
+  selectedStartYearTimeline = MIN_YEAR;
+  selectedEndYearTimeline = MAX_YEAR;
+
+  yearFrom.value = "";
+  yearTo.value = "";
+  centurySelect.value = "";
+
+  updateTimeline();
+}
+
+resetTimeline.addEventListener(
+  "click",
+  resetTimelineSelection
+);
+
+// Update the number of matching artworks.
+document.addEventListener(
+  "timelineResultsUpdated",
+  event => {
+    const count = event.detail?.count ?? 0;
+    const mappedCount =
+      event.detail?.mappedCount ?? 0;
+
+    timelineCount.textContent =
+      `${count} matching artworks · ${mappedCount} on map`;
+  }
+);
+
+// Handle artwork selection from search.
+window.addEventListener(
+  "timecanvas:artwork-selected",
+  event => {
+    const artwork = event.detail?.artwork;
+
+    if (!artwork || artwork.date_start == null) {
+      return;
     }
-});
 
-// Previous 1000 years
-previousMillennium.addEventListener("click", function () {
-    if (rangeStart > MIN_YEAR) {
-        rangeStart -= RANGE_SIZE;
-        currentYear = rangeStart;
-        updateTimeline();
-    }
-});
-
-// Next 1000 years
-nextMillennium.addEventListener("click", function () {
-    if (rangeStart + RANGE_SIZE < MAX_YEAR) {
-        rangeStart += RANGE_SIZE;
-        currentYear = rangeStart;
-        updateTimeline();
-    }
-});
-
-window.addEventListener("timecanvas:artwork-selected", function (event) {
-    const artwork = event.detail.artwork;
     const year = Number(artwork.date_start);
 
-    if (artwork.date_start == null || !Number.isFinite(year) ||
-        year < MIN_YEAR || year >= MAX_YEAR ||
-        !artwork.coordinates ||
-        !artworks.some(record => record.id === artwork.id)) {
-        return;
+    if (
+      !Number.isFinite(year) ||
+      year < MIN_YEAR ||
+      year > MAX_YEAR
+    ) {
+      return;
     }
 
-    currentYear = Math.floor(year / CENTURY_STEP) * CENTURY_STEP;
-    rangeStart = Math.floor(year / RANGE_SIZE) * RANGE_SIZE;
+    // Show the exact artwork year.
+    selectedStartYearTimeline = year;
+    selectedEndYearTimeline = year;
+
+    yearFrom.value = year;
+    yearTo.value = "";
+
+    centurySelect.value = "";
     updateTimeline();
 
-    const marker = artworkMarkers.get(artwork.id);
-    if (marker) {
-        event.preventDefault();
-        timelineArtworkLayer.zoomToShowLayer(marker, () => {
-            map.setView(marker.getLatLng(), Math.max(map.getZoom(), 10));
-            marker.openPopup();
-        });
-    }
-});
+    // Navigate to the artwork marker.
+    if (
+      typeof artworkMarkers !== "undefined" &&
+      typeof timelineArtworkLayer !== "undefined" &&
+      typeof map !== "undefined"
+    ) {
+      const marker = artworkMarkers.get(artwork.id);
 
-// Initialize timeline
-updateTimeline();
+      if (marker) {
+        timelineArtworkLayer.zoomToShowLayer(
+          marker,
+          () => {
+            map.setView(
+              marker.getLatLng(),
+              Math.max(map.getZoom(), 10)
+            );
+            marker.openPopup();
+          }
+        );
+      }
+    }
+  }
+);
+
+// Initialize.
+yearFrom.min = MIN_YEAR;
+yearFrom.max = MAX_YEAR;
+yearTo.min = MIN_YEAR;
+yearTo.max = MAX_YEAR;
+
+populateCenturies();
+resetTimelineSelection();

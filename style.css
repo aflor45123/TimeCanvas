@@ -1,171 +1,334 @@
-/* Screen Sections */
-body {
+
+/* TimeCanvas — Main Styles */
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
-.top-box {
-    background-color: grey;
-    border: 2px solid black;
-    padding: 0.5px 20px;
+    font-family: Arial, sans-serif;
+    color: #243236;
+  }
+  
+  /* Header */
+  
+  .top-box {
+    background: #38464a;
+    border-bottom: 2px solid #243236;
+    padding: 12px 20px;
     text-align: center;
     color: white;
-}
-.bottom-box {
-    background-color: grey;
-    border: 2px solid black;
-    padding: 8px 20px;
-    text-align: center;
-    margin-top: auto;
-}
-
-/* Map Layout */
-#map {
+  }
+  
+  .top-box h1 {
+    margin: 0;
+    font-size: 27px;
+  }
+  
+  /* Map */
+  
+  .map-workspace {
+    position: relative;
+    display: flex;
     flex: 1;
-    min-height: 200px;
-    background-color: #c5dce5;
-}
-.leaflet-tooltip.country-label {
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-    color: #39362d;
-    font-size: 11px;
-}
-
-/* Art pop-up */
-.art-popup {
+    min-height: 480px;
+  }
+  
+  #map {
+    flex: 1;
+    width: 100%;
+    min-height: 480px;
+    background: #c5dce5;
+  }
+  
+  #map .leaflet-control-zoom {
+    border: 2px solid #243236;
+  }
+  
+  #map .leaflet-control-zoom-in {
+    border-bottom: 1px solid #243236;
+  }
+  
+  /* Artwork popups */
+  
+  .art-popup {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     width: 300px;
-}
-.art-popup img {
-    display: block;
-    width: 50%;
-    height: 50%;
+    max-width: 100%;
+  }
+  
+  .art-popup img {
+    width: 45%;
+    max-height: 170px;
     object-fit: contain;
     flex-shrink: 0;
-}
-.art-popup h2 {
-    margin: 5px 0 8px;
+  }
+  
+  .art-popup h2 {
     font-size: 18px;
-}
-.art-popup p {
-    margin: 4px 0;
-}
-
-.art-popup .popup-label {
-    color: darkred;
-    font-weight: bold;
-}
-#map .leaflet-popup-content-wrapper {
-    border-radius: 0;
-}
-
-/* Timeline */
-
-.timeline-container {
-    width: 100%;
+    margin: 5px 0 8px;
+  }
+  
+  .art-popup p {
+    margin: 5px 0;
+    font-size: 13px;
+  }
+  
+  .art-popup-more {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #24543d;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .art-popup-more:hover {
+    background: #173b2a;
+  }
+  
+  /* Timeline */
+  
+  .timeline-container {
+    background: #38464a;
+    border-top: 2px solid #243236;
+    color: white;
+    padding: 20px 28px;
+    margin-top: auto;
+  }
+  
+  .timeline-heading {
+    max-width: 1100px;
+    margin: 0 auto 18px;
+  }
+  
+  .timeline-heading h2 {
+    font-size: 22px;
+    margin: 0 0 7px;
+  }
+  
+  .timeline-heading p {
+    font-size: 14px;
+    color: #e2ebed;
+    margin: 0;
+  }
+  
+  /* Timeline controls */
+  
+  .timeline-controls-new {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
     max-width: 1100px;
     margin: 0 auto;
-    box-sizing: border-box;
-}
-
-.timeline-container h2 {
-    color: white;
-    font-size: 20px;
-    margin: 5px 0 15px;
-}
-
-.timeline-controls {
+  }
+  
+  .timeline-control-field {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.timeline-main {
-    flex: 1;
+    flex-direction: column;
+    gap: 7px;
     min-width: 0;
-}
-
-.timeline-labels {
-    display: flex;
-    justify-content: space-between;
+  }
+  
+  .timeline-control-field label {
+    font-size: 14px;
+    font-weight: bold;
     color: white;
-    margin-bottom: 10px;
-}
-
-#selected-year {
+  }
+  
+  .timeline-control-field select,
+  .timeline-control-field input {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+    border: 1px solid #abb7ba;
+    border-radius: 6px;
+    background: white;
+    color: #243236;
+    font-size: 15px;
+  }
+  
+  .timeline-control-field select:focus,
+  .timeline-control-field input:focus {
+    outline: 3px solid #ffe08a;
+    outline-offset: 2px;
+  }
+  
+  .date-range-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  /* Show artwork button */
+  
+  #show-artworks {
+    padding: 11px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #f5c84c;
+    color: #243236;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  #show-artworks:hover {
+    background: #e7b83c;
+  }
+  
+  #show-artworks:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+  }
+  
+  /* Reset button */
+  
+  #reset-timeline {
+    padding: 11px 16px;
+    border: 1px solid white;
+    border-radius: 6px;
+    background: white;
+    color: #243236;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  #reset-timeline:hover:not(:disabled) {
+    background: #e2ebed;
+  }
+  
+  #reset-timeline:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  
+  /* Selected period and result count */
+  
+  .timeline-range-summary {
+    background: #29393d;
+    border-radius: 7px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  
+  #selected-year {
+    margin: 0 0 6px;
+    font-size: 18px;
     font-weight: bold;
     color: #ffe08a;
-    font-size: 20px;
-}
-
-#timeline-slider {
-    width: 100%;
+  }
+  
+  #timeline-count {
+    margin: 0;
+    font-size: 14px;
+    color: #e2ebed;
+  }
+  
+  /* Artwork detail panel */
+  
+  .artwork-detail-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    width: min(90vw, 600px);
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  }
+  
+  .artwork-detail-panel[hidden] {
+    display: none;
+  }
+  
+  #artwork-detail-content h2 {
+    margin: 0 0 14px;
+    font-size: 24px;
+  }
+  
+  #artwork-detail-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    margin: 15px auto;
+  }
+  
+  #artwork-detail-content p {
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+  
+  .detail-close-button {
+    float: right;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 28px;
     cursor: pointer;
-    accent-color: #ffe08a;
-}
-
-.timeline-controls button,
-.timeline-navigation button {
-    background-color: white;
-    border: 1px solid #333;
-    border-radius: 5px;
-    padding: 10px 15px;
-    cursor: pointer;
-}
-
-.timeline-controls button:hover,
-.timeline-navigation button:hover {
-    background-color: #ffe08a;
-}
-
-.timeline-controls button:disabled,
-.timeline-navigation button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.timeline-navigation {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-@media (max-width: 600px) {
-    .timeline-navigation button {
-        padding: 8px;
-        font-size: 12px;
+  }
+  
+  /* Desktop layout */
+  
+  @media (min-width: 900px) {
+    .timeline-controls-new {
+      grid-template-columns:
+        minmax(180px, 1.2fr)
+        minmax(250px, 1.5fr)
+        auto
+        auto;
+      align-items: end;
     }
-
-    .timeline-controls {
-        gap: 8px;
+  
+    .timeline-range-summary {
+      grid-column: 1 / -1;
     }
-}
-
-#map .leaflet-marker-icon {
-    filter: hue-rotate(150deg) saturate(1.5);
-}
-
-#map .leaflet-control-zoom {
-    border: 2px solid black;
-}
-
-#map .leaflet-control-zoom-in {
-    border-bottom: 1px solid black;
-}
-
-.art-popup-more {
-    margin-top: 8px;
-    padding: 6px 10px;
-    border: 1px solid #24543d;
-    border-radius: 4px;
-    background-color: #24543d;
-    color: white;
-    cursor: pointer;
-}
+  }
+  
+  /* Tablet and mobile */
+  
+  @media (max-width: 899px) {
+    .timeline-container {
+      padding: 18px 15px;
+    }
+  
+    .timeline-heading h2 {
+      font-size: 20px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .date-range-controls {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  
+    .timeline-control-field input,
+    .timeline-control-field select {
+      font-size: 14px;
+    }
+  
+    .artwork-detail-panel {
+      width: 94vw;
+      padding: 18px;
+    }
+  
+    .art-popup {
+      width: 250px;
+    }
+  }
+  
