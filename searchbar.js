@@ -1,246 +1,259 @@
-
-/* TimeCanvas — Search Bar and Timeline Integration */
-
-const searchInput = document.getElementById("timecanvasSearchInput");
-const styleFilter = document.getElementById("timecanvasStyleFilter");
-const periodFilter = document.getElementById("timecanvasPeriodFilter");
-const searchResults = document.getElementById("timecanvasSearchResults");
-const searchStatus = document.getElementById("timecanvasSearchStatus");
-const clearSearch = document.getElementById("timecanvasClearSearch");
-
-let searchCollection = [];
-let searchStartYear = 1000;
-let searchEndYear = 2026;
-
-function artworkDateRange(artwork) {
-  if (
-    artwork.date_start == null ||
-    artwork.date_end == null ||
-    artwork.date_start === "" ||
-    artwork.date_end === ""
-  ) {
-    return null;
-  }
-
-  const start = Number(artwork.date_start);
-  const end = Number(artwork.date_end);
-
-  if (
-    !Number.isFinite(start) ||
-    !Number.isFinite(end) ||
-    start > end
-  ) {
-    return null;
-  }
-
-  return { start, end };
-}
-
-function artworkOverlaps(artwork, start, end) {
-  const range = artworkDateRange(artwork);
-
-  return range !== null &&
-    range.start <= end &&
-    range.end >= start;
-}
-
-function populateSearchFilters() {
-  const styles = [...new Set(
-    searchCollection
-      .map(artwork => artwork.movement)
-      .filter(Boolean)
-  )].sort();
-
-  styleFilter.replaceChildren(
-    new Option("All styles", "")
-  );
-
-  styles.forEach(style => {
-    styleFilter.add(new Option(style, style));
-  });
-
-  periodFilter.replaceChildren(
-    new Option("All centuries", "")
-  );
-
-  for (let year = 1000; year <= 2000; year += 100) {
-    const hasArtworks = searchCollection.some(artwork =>
-      artworkOverlaps(artwork, year, year + 99)
-    );
-
-    if (hasArtworks) {
-      periodFilter.add(
-        new Option(`${year}s`, String(year))
-      );
+const gettingTheSearchBarInputTimeCanvas = document.getElementById("timecanvasSearchInput");
+const gettingTheArtStyleFilterTimeCanvas = document.getElementById("timecanvasStyleFilter");
+const gettingTheTimePeriodFilterTimeCanvas = document.getElementById("timecanvasPeriodFilter");
+const gettingTheSearchResultsTimeCanvas = document.getElementById("timecanvasSearchResults");
+const gettingTheSearchStatusTimeCanvas = document.getElementById("timecanvasSearchStatus");
+const gettingTheClearSearchButtonTimeCanvas = document.getElementById("timecanvasClearSearch");
+const gettingTheSearchPanelTimeCanvas = document.querySelector(".timecanvas-search-panel");
+const gettingTheSearchToggleButtonTimeCanvas = document.getElementById("timecanvasSearchToggle");
+const gettingTheSearchPanelContentTimeCanvas = document.getElementById("timecanvasSearchContent");
+let gettingAllTheArtworksFromTheJsonFileTimeCanvas = [];
+let gettingTheSearchStartYearTimeCanvas = 1000;
+let gettingTheSearchEndYearTimeCanvas = 2026;
+function gettingTheArtworkDateRangeTimeCanvas(gettingTheCurrentArtworkTimeCanvas) {
+    let gettingTheArtworkStartingYearTimeCanvas = 0;
+    let gettingTheArtworkEndingYearTimeCanvas = 0;
+    if (gettingTheCurrentArtworkTimeCanvas.date_start === null || gettingTheCurrentArtworkTimeCanvas.date_start === undefined ||
+        gettingTheCurrentArtworkTimeCanvas.date_end === null || gettingTheCurrentArtworkTimeCanvas.date_end === undefined ||
+        gettingTheCurrentArtworkTimeCanvas.date_start === "" || gettingTheCurrentArtworkTimeCanvas.date_end === "") {
+        return null;
     }
-  }
+    gettingTheArtworkStartingYearTimeCanvas = Number(gettingTheCurrentArtworkTimeCanvas.date_start);
+    gettingTheArtworkEndingYearTimeCanvas = Number(gettingTheCurrentArtworkTimeCanvas.date_end);
+    if (!Number.isFinite(gettingTheArtworkStartingYearTimeCanvas) ||
+        !Number.isFinite(gettingTheArtworkEndingYearTimeCanvas) ||
+        gettingTheArtworkStartingYearTimeCanvas > gettingTheArtworkEndingYearTimeCanvas) {
+        return null;
+    }
+    return {
+        start: gettingTheArtworkStartingYearTimeCanvas,
+        end: gettingTheArtworkEndingYearTimeCanvas
+    };
 }
-
-function getSearchMatches() {
-  const query = searchInput.value.trim().toLowerCase();
-  const style = styleFilter.value;
-  const period = periodFilter.value;
-
-  return searchCollection.filter(artwork => {
-    const searchableText = [
-      artwork.title,
-      artwork.artist,
-      artwork.movement,
-      artwork.place_of_origin,
-      artwork.medium,
-      artwork.date_display
-    ].filter(Boolean).join(" ").toLowerCase();
-
-    const matchesText =
-      !query || searchableText.includes(query);
-
-    const matchesStyle =
-      !style || artwork.movement === style;
-
-    const matchesTimeline = artworkOverlaps(
-      artwork,
-      searchStartYear,
-      searchEndYear
-    );
-
-    const matchesPeriod =
-      !period || artworkOverlaps(
-        artwork,
-        Number(period),
-        Number(period) + 99
-      );
-
-    return matchesText &&
-      matchesStyle &&
-      matchesTimeline &&
-      matchesPeriod;
-  });
+function checkingIfTheArtworkMatchesTheDatesTimeCanvas(gettingTheCurrentArtworkTimeCanvas, gettingTheStartingYearTimeCanvas, gettingTheEndingYearTimeCanvas) {
+    let gettingTheArtworkDateRangeResultTimeCanvas = null;
+    gettingTheArtworkDateRangeResultTimeCanvas = gettingTheArtworkDateRangeTimeCanvas(gettingTheCurrentArtworkTimeCanvas);
+    if (gettingTheArtworkDateRangeResultTimeCanvas === null) {
+        return false;
+    }
+    return gettingTheArtworkDateRangeResultTimeCanvas.start <= gettingTheEndingYearTimeCanvas &&
+        gettingTheArtworkDateRangeResultTimeCanvas.end >= gettingTheStartingYearTimeCanvas;
 }
-
-function renderSearchResults(matches) {
-  searchResults.replaceChildren();
-
-  searchStatus.textContent =
-    `${matches.length} artwork(s) found`;
-
-  if (matches.length === 0) {
-    searchResults.textContent =
-      "No matching artworks found. Try another search or change the date range.";
-    return;
-  }
-
-  matches.forEach(artwork => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "timecanvas-result-button";
-
-    const image = document.createElement("img");
-    image.className = "timecanvas-result-picture";
-    image.src = artwork.image_url || "";
-    image.alt = "";
-    image.loading = "lazy";
-
-    const text = document.createElement("span");
-    text.className = "timecanvas-result-text";
-
-    const title = document.createElement("strong");
-    title.textContent = artwork.title || "Untitled";
-
-    const details = document.createElement("span");
-    details.textContent =
-      `${artwork.artist || "Unknown artist"} • ${artwork.date_display || ""}`;
-
-    text.append(title, details);
-    button.append(image, text);
-
-    button.addEventListener("click", () => {
-      // Show details using the current internal.js panel.
-      if (typeof showArtworkDetails === "function") {
-        showArtworkDetails(artwork);
-      }
-
-      // Focus the selected artwork on the map.
-      const marker = artworkMarkers.get(artwork.id);
-
-      if (marker) {
-        timelineArtworkLayer.zoomToShowLayer(
-          marker,
-          () => {
-            map.setView(
-              marker.getLatLng(),
-              Math.max(map.getZoom(), 10)
-            );
-
-            marker.openPopup();
-          }
+function puttingTheFilterOptionsOnThePageTimeCanvas() {
+    let gettingTheAvailableArtStylesTimeCanvas = [];
+    let gettingTheCurrentArtworkTimeCanvas = null;
+    let gettingTheCurrentStyleTimeCanvas = "";
+    let gettingTheNewOptionTimeCanvas = null;
+    let gettingTheCurrentCenturyTimeCanvas = 1000;
+    let gettingTheCenturyHasArtworksTimeCanvas = false;
+    let gettingTheArtworkNumberTimeCanvas = 0;
+    let gettingTheFilterNumberTimeCanvas = 0;
+    for (gettingTheArtworkNumberTimeCanvas = 0; gettingTheArtworkNumberTimeCanvas < gettingAllTheArtworksFromTheJsonFileTimeCanvas.length; gettingTheArtworkNumberTimeCanvas++) {
+        gettingTheCurrentArtworkTimeCanvas = gettingAllTheArtworksFromTheJsonFileTimeCanvas[gettingTheArtworkNumberTimeCanvas];
+        gettingTheCurrentStyleTimeCanvas = String(gettingTheCurrentArtworkTimeCanvas.movement || "").trim();
+        if (gettingTheCurrentStyleTimeCanvas !== "" && !gettingTheAvailableArtStylesTimeCanvas.includes(gettingTheCurrentStyleTimeCanvas)) {
+            gettingTheAvailableArtStylesTimeCanvas.push(gettingTheCurrentStyleTimeCanvas);
+        }
+    }
+    gettingTheAvailableArtStylesTimeCanvas.sort();
+    gettingTheArtStyleFilterTimeCanvas.replaceChildren(new Option("All styles", ""));
+    for (gettingTheFilterNumberTimeCanvas = 0; gettingTheFilterNumberTimeCanvas < gettingTheAvailableArtStylesTimeCanvas.length; gettingTheFilterNumberTimeCanvas++) {
+        gettingTheNewOptionTimeCanvas = document.createElement("option");
+        gettingTheNewOptionTimeCanvas.value = gettingTheAvailableArtStylesTimeCanvas[gettingTheFilterNumberTimeCanvas];
+        gettingTheNewOptionTimeCanvas.textContent = gettingTheAvailableArtStylesTimeCanvas[gettingTheFilterNumberTimeCanvas];
+        gettingTheArtStyleFilterTimeCanvas.appendChild(gettingTheNewOptionTimeCanvas);
+    }
+    gettingTheTimePeriodFilterTimeCanvas.replaceChildren(new Option("All centuries", ""));
+    for (gettingTheCurrentCenturyTimeCanvas = 1000; gettingTheCurrentCenturyTimeCanvas <= 2000; gettingTheCurrentCenturyTimeCanvas += 100) {
+        gettingTheCenturyHasArtworksTimeCanvas = false;
+        for (gettingTheArtworkNumberTimeCanvas = 0; gettingTheArtworkNumberTimeCanvas < gettingAllTheArtworksFromTheJsonFileTimeCanvas.length; gettingTheArtworkNumberTimeCanvas++) {
+            gettingTheCurrentArtworkTimeCanvas = gettingAllTheArtworksFromTheJsonFileTimeCanvas[gettingTheArtworkNumberTimeCanvas];
+            if (checkingIfTheArtworkMatchesTheDatesTimeCanvas(gettingTheCurrentArtworkTimeCanvas, gettingTheCurrentCenturyTimeCanvas, gettingTheCurrentCenturyTimeCanvas + 99)) {
+                gettingTheCenturyHasArtworksTimeCanvas = true;
+                break;
+            }
+        }
+        if (gettingTheCenturyHasArtworksTimeCanvas === true) {
+            gettingTheNewOptionTimeCanvas = document.createElement("option");
+            gettingTheNewOptionTimeCanvas.value = String(gettingTheCurrentCenturyTimeCanvas);
+            gettingTheNewOptionTimeCanvas.textContent = String(gettingTheCurrentCenturyTimeCanvas) + "s";
+            gettingTheTimePeriodFilterTimeCanvas.appendChild(gettingTheNewOptionTimeCanvas);
+        }
+    }
+}
+function findingTheArtworksThatMatchTheSearchTimeCanvas() {
+    let gettingTheTextEnteredInSearchBarTimeCanvas = "";
+    let gettingTheSelectedArtStyleTimeCanvas = "";
+    let gettingTheSelectedCenturyTimeCanvas = "";
+    let gettingTheCurrentArtworkTimeCanvas = null;
+    let gettingTheArtworkSearchableTextTimeCanvas = "";
+    let gettingTheMatchesSearchTextTimeCanvas = false;
+    let gettingTheMatchesArtStyleTimeCanvas = false;
+    let gettingTheMatchesTimelineTimeCanvas = false;
+    let gettingTheMatchesCenturyTimeCanvas = false;
+    let gettingTheArtworksAfterSearchingTimeCanvas = [];
+    let gettingTheArtworkNumberTimeCanvas = 0;
+    gettingTheTextEnteredInSearchBarTimeCanvas = gettingTheSearchBarInputTimeCanvas.value.trim().toLowerCase();
+    gettingTheSelectedArtStyleTimeCanvas = gettingTheArtStyleFilterTimeCanvas.value;
+    gettingTheSelectedCenturyTimeCanvas = gettingTheTimePeriodFilterTimeCanvas.value;
+    for (gettingTheArtworkNumberTimeCanvas = 0; gettingTheArtworkNumberTimeCanvas < gettingAllTheArtworksFromTheJsonFileTimeCanvas.length; gettingTheArtworkNumberTimeCanvas++) {
+        gettingTheCurrentArtworkTimeCanvas = gettingAllTheArtworksFromTheJsonFileTimeCanvas[gettingTheArtworkNumberTimeCanvas];
+        gettingTheArtworkSearchableTextTimeCanvas = (
+            String(gettingTheCurrentArtworkTimeCanvas.title || "") + " " +
+            String(gettingTheCurrentArtworkTimeCanvas.artist || "") + " " +
+            String(gettingTheCurrentArtworkTimeCanvas.movement || "") + " " +
+            String(gettingTheCurrentArtworkTimeCanvas.place_of_origin || "") + " " +
+            String(gettingTheCurrentArtworkTimeCanvas.medium || "") + " " +
+            String(gettingTheCurrentArtworkTimeCanvas.date_display || "")
+        ).toLowerCase();
+        gettingTheMatchesSearchTextTimeCanvas = gettingTheTextEnteredInSearchBarTimeCanvas === "" ||
+            gettingTheArtworkSearchableTextTimeCanvas.includes(gettingTheTextEnteredInSearchBarTimeCanvas);
+        gettingTheMatchesArtStyleTimeCanvas = gettingTheSelectedArtStyleTimeCanvas === "" ||
+            gettingTheCurrentArtworkTimeCanvas.movement === gettingTheSelectedArtStyleTimeCanvas;
+        gettingTheMatchesTimelineTimeCanvas = checkingIfTheArtworkMatchesTheDatesTimeCanvas(
+            gettingTheCurrentArtworkTimeCanvas,
+            gettingTheSearchStartYearTimeCanvas,
+            gettingTheSearchEndYearTimeCanvas
         );
-      }
-    });
-
-    searchResults.appendChild(button);
-  });
+        gettingTheMatchesCenturyTimeCanvas = gettingTheSelectedCenturyTimeCanvas === "" ||
+            checkingIfTheArtworkMatchesTheDatesTimeCanvas(
+                gettingTheCurrentArtworkTimeCanvas,
+                Number(gettingTheSelectedCenturyTimeCanvas),
+                Number(gettingTheSelectedCenturyTimeCanvas) + 99
+            );
+        if (gettingTheMatchesSearchTextTimeCanvas && gettingTheMatchesArtStyleTimeCanvas &&
+            gettingTheMatchesTimelineTimeCanvas && gettingTheMatchesCenturyTimeCanvas) {
+            gettingTheArtworksAfterSearchingTimeCanvas.push(gettingTheCurrentArtworkTimeCanvas);
+        }
+    }
+    return gettingTheArtworksAfterSearchingTimeCanvas;
 }
-
-function updateSearch() {
-  const matches = getSearchMatches();
-
-  renderSearchResults(matches);
-
-  // Tell internal.js which artworks match all filters.
-  window.dispatchEvent(
-    new CustomEvent("timecanvas:search-changed", {
-      detail: {
-        artworks: matches
-      }
-    })
-  );
+function showingTheArtworkSearchResultsTimeCanvas(gettingTheArtworksAfterSearchingTimeCanvas) {
+    let gettingTheCurrentArtworkTimeCanvas = null;
+    let gettingTheArtworkResultButtonTimeCanvas = null;
+    let gettingTheArtworkResultImageTimeCanvas = null;
+    let gettingTheArtworkResultTextTimeCanvas = null;
+    let gettingTheArtworkResultTitleTimeCanvas = null;
+    let gettingTheArtworkResultExtraInfoTimeCanvas = null;
+    let gettingTheArtworkNumberTimeCanvas = 0;
+    gettingTheSearchResultsTimeCanvas.replaceChildren();
+    gettingTheSearchStatusTimeCanvas.textContent = String(gettingTheArtworksAfterSearchingTimeCanvas.length) + " artwork(s) found";
+    if (gettingTheArtworksAfterSearchingTimeCanvas.length === 0) {
+        gettingTheSearchResultsTimeCanvas.textContent = "No matching artworks found. Try another search or change the date range.";
+        return;
+    }
+    for (gettingTheArtworkNumberTimeCanvas = 0; gettingTheArtworkNumberTimeCanvas < gettingTheArtworksAfterSearchingTimeCanvas.length; gettingTheArtworkNumberTimeCanvas++) {
+        gettingTheCurrentArtworkTimeCanvas = gettingTheArtworksAfterSearchingTimeCanvas[gettingTheArtworkNumberTimeCanvas];
+        gettingTheArtworkResultButtonTimeCanvas = document.createElement("button");
+        gettingTheArtworkResultButtonTimeCanvas.type = "button";
+        gettingTheArtworkResultButtonTimeCanvas.className = "timecanvas-result-button";
+        gettingTheArtworkResultButtonTimeCanvas.dataset.artworkId = String(gettingTheCurrentArtworkTimeCanvas.id);
+        gettingTheArtworkResultImageTimeCanvas = document.createElement("img");
+        gettingTheArtworkResultImageTimeCanvas.className = "timecanvas-result-picture";
+        gettingTheArtworkResultImageTimeCanvas.src = gettingTheCurrentArtworkTimeCanvas.image_url || "";
+        gettingTheArtworkResultImageTimeCanvas.alt = "";
+        gettingTheArtworkResultImageTimeCanvas.loading = "lazy";
+        gettingTheArtworkResultTextTimeCanvas = document.createElement("span");
+        gettingTheArtworkResultTextTimeCanvas.className = "timecanvas-result-text";
+        gettingTheArtworkResultTitleTimeCanvas = document.createElement("strong");
+        gettingTheArtworkResultTitleTimeCanvas.textContent = gettingTheCurrentArtworkTimeCanvas.title || "Untitled";
+        gettingTheArtworkResultExtraInfoTimeCanvas = document.createElement("span");
+        gettingTheArtworkResultExtraInfoTimeCanvas.textContent =
+            String(gettingTheCurrentArtworkTimeCanvas.artist || "Unknown artist") + " • " +
+            String(gettingTheCurrentArtworkTimeCanvas.date_display || "");
+        gettingTheArtworkResultTextTimeCanvas.appendChild(gettingTheArtworkResultTitleTimeCanvas);
+        gettingTheArtworkResultTextTimeCanvas.appendChild(gettingTheArtworkResultExtraInfoTimeCanvas);
+        gettingTheArtworkResultButtonTimeCanvas.appendChild(gettingTheArtworkResultImageTimeCanvas);
+        gettingTheArtworkResultButtonTimeCanvas.appendChild(gettingTheArtworkResultTextTimeCanvas);
+        gettingTheSearchResultsTimeCanvas.appendChild(gettingTheArtworkResultButtonTimeCanvas);
+    }
 }
-
-// Initialize search when internal.js loads artwork data.
-function initializeSearch(collection) {
-  if (!Array.isArray(collection)) return;
-
-  searchCollection = collection;
-  populateSearchFilters();
-  updateSearch();
+function updatingTheArtworkSearchTimeCanvas() {
+    let gettingTheArtworksAfterSearchingTimeCanvas = [];
+    gettingTheArtworksAfterSearchingTimeCanvas = findingTheArtworksThatMatchTheSearchTimeCanvas();
+    showingTheArtworkSearchResultsTimeCanvas(gettingTheArtworksAfterSearchingTimeCanvas);
+    window.dispatchEvent(new CustomEvent("timecanvas:search-changed", {
+        detail: { artworks: gettingTheArtworksAfterSearchingTimeCanvas }
+    }));
 }
-
-window.addEventListener(
-  "timecanvas:artworks-loaded",
-  event => {
-    initializeSearch(event.detail.artworks);
-  }
-);
-
-// Update search results when the timeline changes.
-document.addEventListener(
-  "timelineChange",
-  event => {
-    searchStartYear = event.detail.startYear;
-    searchEndYear = event.detail.endYear;
-
-    updateSearch();
-  }
-);
-
-// Search as the user types.
-searchInput.addEventListener("input", updateSearch);
-
-styleFilter.addEventListener("change", updateSearch);
-periodFilter.addEventListener("change", updateSearch);
-
-// Clear search filters without changing the timeline.
-clearSearch.addEventListener("click", () => {
-  searchInput.value = "";
-  styleFilter.value = "";
-  periodFilter.value = "";
-
-  updateSearch();
-  searchInput.focus();
+function loadingTheArtworksIntoTheSearchBarTimeCanvas(gettingTheArtworkCollectionTimeCanvas) {
+    if (!Array.isArray(gettingTheArtworkCollectionTimeCanvas)) {
+        return;
+    }
+    gettingAllTheArtworksFromTheJsonFileTimeCanvas = gettingTheArtworkCollectionTimeCanvas;
+    puttingTheFilterOptionsOnThePageTimeCanvas();
+    updatingTheArtworkSearchTimeCanvas();
+}
+function changingTheSearchSectionVisibilityTimeCanvas() {
+    let isTheSearchSectionCollapsedTimeCanvas = false;
+    isTheSearchSectionCollapsedTimeCanvas = gettingTheSearchPanelTimeCanvas.classList.toggle("is-collapsed");
+    gettingTheSearchPanelContentTimeCanvas.hidden = isTheSearchSectionCollapsedTimeCanvas;
+    if (isTheSearchSectionCollapsedTimeCanvas === true) {
+        gettingTheSearchToggleButtonTimeCanvas.textContent = "Show Search";
+        gettingTheSearchToggleButtonTimeCanvas.setAttribute("aria-expanded", "false");
+    } else {
+        gettingTheSearchToggleButtonTimeCanvas.textContent = "Hide";
+        gettingTheSearchToggleButtonTimeCanvas.setAttribute("aria-expanded", "true");
+    }
+    window.dispatchEvent(new Event("resize"));
+    if (typeof map !== "undefined" && typeof map.invalidateSize === "function") {
+        map.invalidateSize();
+    }
+}
+gettingTheSearchToggleButtonTimeCanvas.addEventListener("click", changingTheSearchSectionVisibilityTimeCanvas);
+gettingTheSearchBarInputTimeCanvas.addEventListener("input", updatingTheArtworkSearchTimeCanvas);
+gettingTheArtStyleFilterTimeCanvas.addEventListener("change", updatingTheArtworkSearchTimeCanvas);
+gettingTheTimePeriodFilterTimeCanvas.addEventListener("change", updatingTheArtworkSearchTimeCanvas);
+gettingTheClearSearchButtonTimeCanvas.addEventListener("click", function() {
+    gettingTheSearchBarInputTimeCanvas.value = "";
+    gettingTheArtStyleFilterTimeCanvas.value = "";
+    gettingTheTimePeriodFilterTimeCanvas.value = "";
+    updatingTheArtworkSearchTimeCanvas();
+    gettingTheSearchBarInputTimeCanvas.focus();
 });
-
-// If artwork data loaded before this script initialized,
-// use the collection already held by internal.js.
-if (typeof artworks !== "undefined" && artworks.length) {
-  initializeSearch(artworks);
+gettingTheSearchResultsTimeCanvas.addEventListener("click", function(gettingTheClickEventTimeCanvas) {
+    let gettingTheClickedArtworkButtonTimeCanvas = null;
+    let gettingTheArtworkIdFromButtonTimeCanvas = "";
+    let gettingTheCurrentArtworkTimeCanvas = null;
+    let gettingTheSelectedArtworkTimeCanvas = null;
+    let gettingTheSelectedArtworkMarkerTimeCanvas = null;
+    let gettingTheArtworkNumberTimeCanvas = 0;
+    gettingTheClickedArtworkButtonTimeCanvas = gettingTheClickEventTimeCanvas.target.closest("button[data-artwork-id]");
+    if (gettingTheClickedArtworkButtonTimeCanvas === null) {
+        return;
+    }
+    gettingTheArtworkIdFromButtonTimeCanvas = gettingTheClickedArtworkButtonTimeCanvas.dataset.artworkId;
+    for (gettingTheArtworkNumberTimeCanvas = 0; gettingTheArtworkNumberTimeCanvas < gettingAllTheArtworksFromTheJsonFileTimeCanvas.length; gettingTheArtworkNumberTimeCanvas++) {
+        gettingTheCurrentArtworkTimeCanvas = gettingAllTheArtworksFromTheJsonFileTimeCanvas[gettingTheArtworkNumberTimeCanvas];
+        if (String(gettingTheCurrentArtworkTimeCanvas.id) === gettingTheArtworkIdFromButtonTimeCanvas) {
+            gettingTheSelectedArtworkTimeCanvas = gettingTheCurrentArtworkTimeCanvas;
+            break;
+        }
+    }
+    if (gettingTheSelectedArtworkTimeCanvas === null) {
+        return;
+    }
+    if (typeof showArtworkDetails === "function") {
+        showArtworkDetails(gettingTheSelectedArtworkTimeCanvas);
+    }
+    if (typeof artworkMarkers !== "undefined" && typeof timelineArtworkLayer !== "undefined" && typeof map !== "undefined") {
+        gettingTheSelectedArtworkMarkerTimeCanvas = artworkMarkers.get(gettingTheSelectedArtworkTimeCanvas.id);
+        if (gettingTheSelectedArtworkMarkerTimeCanvas !== undefined) {
+            timelineArtworkLayer.zoomToShowLayer(gettingTheSelectedArtworkMarkerTimeCanvas, function() {
+                map.setView(gettingTheSelectedArtworkMarkerTimeCanvas.getLatLng(), Math.max(map.getZoom(), 10));
+                gettingTheSelectedArtworkMarkerTimeCanvas.openPopup();
+            });
+        }
+    }
+});
+window.addEventListener("timecanvas:artworks-loaded", function(gettingTheArtworkLoadEventTimeCanvas) {
+    loadingTheArtworksIntoTheSearchBarTimeCanvas(gettingTheArtworkLoadEventTimeCanvas.detail.artworks);
+});
+document.addEventListener("timelineChange", function(gettingTheTimelineChangeEventTimeCanvas) {
+    gettingTheSearchStartYearTimeCanvas = gettingTheTimelineChangeEventTimeCanvas.detail.startYear;
+    gettingTheSearchEndYearTimeCanvas = gettingTheTimelineChangeEventTimeCanvas.detail.endYear;
+    updatingTheArtworkSearchTimeCanvas();
+});
+if (typeof artworks !== "undefined" && artworks.length > 0) {
+    loadingTheArtworksIntoTheSearchBarTimeCanvas(artworks);
 }
