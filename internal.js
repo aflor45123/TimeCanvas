@@ -119,9 +119,9 @@ const worldBounds = [
       artworkDetailContent.appendChild(paragraph);
     });
   
-    if (artwork.description) {
+    if (artwork.short_description) {
       const description = document.createElement("p");
-      description.textContent = artwork.description;
+      description.textContent = artwork.short_description;
   
       artworkDetailContent.appendChild(description);
     }
