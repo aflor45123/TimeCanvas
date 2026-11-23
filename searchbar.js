@@ -244,3 +244,19 @@ clearSearch.addEventListener("click", () => {
 if (typeof artworks !== "undefined" && artworks.length) {
   initializeSearch(artworks);
 }
+
+// Collapse the search panel without clearing its active filters.
+const toggleSearch = document.getElementById("timecanvasSearchToggle");
+const searchBody = document.getElementById("timecanvasSearchContent");
+const searchPanel = toggleSearch.closest(".timecanvas-search-panel");
+toggleSearch.addEventListener("click", () => {
+  const collapsed = toggleSearch.getAttribute("aria-expanded") === "true";
+  searchBody.hidden = collapsed;
+  searchPanel.classList.toggle("is-collapsed", collapsed);
+  toggleSearch.setAttribute("aria-expanded", String(!collapsed));
+  toggleSearch.setAttribute("aria-label", collapsed ? "Expand artwork search" : "Collapse artwork search");
+  toggleSearch.textContent = collapsed ? "Show Search" : "Hide";
+  // Leaflet must recalculate its size after the sidebar width changes.
+  window.dispatchEvent(new Event("resize"));
+  if (typeof map !== "undefined" && typeof map.invalidateSize === "function") map.invalidateSize();
+});

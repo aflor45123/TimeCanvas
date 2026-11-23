@@ -73,6 +73,49 @@ const worldBounds = [
   const closeArtworkDetails =
     document.getElementById("close-artwork-details");
   
+  let selectedDetailArtwork = null;
+  const detailNavigation = document.createElement("nav");
+  detailNavigation.className = "detail-navigation";
+  detailNavigation.setAttribute("aria-label", "Browse artworks");
+  const previousArtwork = document.createElement("button");
+  previousArtwork.type = "button";
+  previousArtwork.textContent = "\u2190";
+  previousArtwork.setAttribute("aria-label", "Previous artwork");
+  const nextArtwork = document.createElement("button");
+  nextArtwork.type = "button";
+  nextArtwork.textContent = "\u2192";
+  nextArtwork.setAttribute("aria-label", "Next artwork");
+  const detailPosition = document.createElement("span");
+  detailPosition.setAttribute("aria-live", "polite");
+  detailNavigation.append(previousArtwork, detailPosition, nextArtwork);
+  artworkDetailPanel.insertBefore(detailNavigation, artworkDetailContent);
+
+  function detailArtworks() {
+    return artworks.filter(artwork =>
+      artworkMatchesTimeline(artwork) &&
+      (searchArtworkIds === null || searchArtworkIds.has(String(artwork.id)))
+    );
+  }
+
+  function updateDetailNavigation() {
+    const collection = detailArtworks();
+    const index = collection.findIndex(artwork => artwork.id === selectedDetailArtwork?.id);
+    previousArtwork.disabled = index <= 0;
+    nextArtwork.disabled = index < 0 || index >= collection.length - 1;
+    detailPosition.textContent = index < 0 ? "Outside current filters" : `${index + 1} of ${collection.length}`;
+  }
+
+  function navigateArtwork(offset) {
+    const collection = detailArtworks();
+    const index = collection.findIndex(artwork => artwork.id === selectedDetailArtwork?.id);
+    if (index < 0 || !collection[index + offset]) return;
+    showArtworkDetails(collection[index + offset]);
+    artworkDetailContent.scrollTop = 0;
+  }
+
+  previousArtwork.addEventListener("click", () => navigateArtwork(-1));
+  nextArtwork.addEventListener("click", () => navigateArtwork(1));
+
   // Close artwork details.
   closeArtworkDetails.addEventListener("click", () => {
     artworkDetailPanel.hidden = true;
@@ -80,7 +123,10 @@ const worldBounds = [
   
   // Display artwork information.
   function showArtworkDetails(artwork) {
+    selectedDetailArtwork = artwork;
+    updateDetailNavigation();
     artworkDetailContent.replaceChildren();
+    artworkDetailContent.scrollTop = 0;
   
     const title = document.createElement("h2");
     title.textContent =
@@ -207,6 +253,7 @@ const worldBounds = [
   
   // Update visible artwork markers.
   function displayArtworks() {
+    updateDetailNavigation();
     timelineArtworkLayer.clearLayers();
     artworkMarkers.clear();
   

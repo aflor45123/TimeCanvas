@@ -28,10 +28,20 @@
     <section class="timecanvas-search-panel"
       aria-label="Search artworks">
 
-      <h2 class="timecanvas-search-heading">
-        Explore Artworks
-      </h2>
-
+      <div class="timecanvas-search-header">
+        <h2 class="timecanvas-search-heading">
+          Explore Artworks
+        </h2>
+        <button
+          class="timecanvas-search-toggle"
+          id="timecanvasSearchToggle"
+          type="button"
+          aria-expanded="true"
+          aria-controls="timecanvasSearchContent">
+          Hide
+        </button>
+      </div>
+      <div class="timecanvas-search-content" id="timecanvasSearchContent">
       <label class="timecanvas-search-label"
         for="timecanvasSearchInput">
         Search by artwork, artist, style, or location
@@ -89,6 +99,7 @@
       <div class="timecanvas-search-results"
         id="timecanvasSearchResults"
         aria-label="Artwork search results">
+      </div>
       </div>
     </section>
 

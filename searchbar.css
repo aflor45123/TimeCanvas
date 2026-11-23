@@ -98,35 +98,28 @@
     flex: 1;
     min-height: 0;
 }
-
 .map-workspace .timecanvas-search-panel {
     position: static;
     width: min(350px, 34%);
     max-height: none;
 }
-
 .map-workspace #map {
     min-width: 0;
 }
-
 @media (max-width: 680px) {
     .map-workspace {
         flex-direction: column;
     }
-
     .map-workspace .timecanvas-search-panel {
         width: 100%;
     }
-
     .map-workspace #map {
         min-height: 50vh;
     }
 }
-
 .timecanvas-details-content:has(.timecanvas-artwork-arrow:not([hidden])) {
     padding-inline: 44px;
 }
-
 .timecanvas-artwork-arrow {
     position: absolute;
     top: 50%;
@@ -140,6 +133,49 @@
     color: white;
     cursor: pointer;
 }
-
 .timecanvas-artwork-arrow.previous { left: 6px; }
 .timecanvas-artwork-arrow.next { right: 6px; }
+.timecanvas-search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.timecanvas-search-toggle {
+    border: 1px solid silver;
+    border-radius: 5px;
+    padding: 7px 10px;
+    background: white;
+    color: darkblue;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.timecanvas-search-toggle:hover {
+    background: whitesmoke;
+}
+.timecanvas-search-toggle:focus-visible {
+    outline: 3px solid gold;
+    outline-offset: 2px;
+}
+.timecanvas-search-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 9px;
+}
+.timecanvas-search-content[hidden] {
+    display: none;
+}
+.map-workspace .timecanvas-search-panel.is-collapsed {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: auto;
+    max-height: none;
+    padding: 7px;
+}
+.timecanvas-search-panel.is-collapsed .timecanvas-search-heading {
+    display: none;
+}

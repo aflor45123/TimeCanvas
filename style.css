@@ -332,3 +332,51 @@
     }
   }
   
+/* Scroll the details independently of the counter and side arrows. */
+.artwork-detail-panel {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 14px;
+  overflow: hidden;
+  padding: 18px 12px;
+}
+.detail-navigation { display: contents; }
+.detail-navigation span {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  align-self: center;
+  padding: 6px 0;
+}
+.detail-navigation button {
+  grid-row: 2;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #abb7ba;
+  border-radius: 6px;
+  background: #29393d;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+.detail-navigation button:first-child { grid-column: 1; }
+.detail-navigation button:last-child { grid-column: 3; }
+.detail-navigation button:disabled { opacity: 0.4; cursor: default; }
+.detail-navigation button:focus-visible { outline: 3px solid #e7b83c; outline-offset: 2px; }
+#artwork-detail-content {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 4px;
+}
+.detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  float: none;
+}
